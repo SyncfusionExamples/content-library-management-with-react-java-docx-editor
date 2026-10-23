@@ -1,0 +1,12 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore runtime Content Library storage
+App_Data
+
+# Ignore built client bundle (generated into src/main/resources/static
+# by `npm run build` in Client-Side/, then packaged into the bootJar)
+src/main/resources/static
