@@ -1,0 +1,37 @@
+plugins {
+	id 'org.springframework.boot' version '3.2.5'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'java'
+}
+
+group = 'com.syncfusion'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+	maven  {
+		//Syncfusion maven repository to download the artifacts.
+		url "https://jars.syncfusion.com/repository/maven-public/"
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.syncfusion:syncfusion-ej2-wordprocessor:+'
+	implementation 'com.syncfusion:syncfusion-ej2-spellchecker:+'
+	implementation 'com.syncfusion:syncfusion-javahelper:+'
+	implementation 'com.syncfusion:syncfusion-licensing:+'
+	implementation 'com.syncfusion:syncfusion-docio:+'
+	implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-tiff', version: '3.10.1'
+	implementation group: 'com.twelvemonkeys.imageio', name: 'imageio-jpeg', version: '3.10.1'
+	implementation 'com.google.code.gson:gson:2.10.1'
+	testImplementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
