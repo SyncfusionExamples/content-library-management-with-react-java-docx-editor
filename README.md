@@ -44,8 +44,7 @@ item without re-uploading.
 
 Selecting a DOCX row and clicking **Edit** opens the Syncfusion
 Word-like Document Editor inside a modal dialog. The editor ships with
-the full Ribbon toolbar (File / Home / Insert / Review / View …),
-comments, and track changes support.
+the full Ribbon toolbar, comments, and track changes support.
 
 Track changes are driven by status:
 
