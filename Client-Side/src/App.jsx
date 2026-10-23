@@ -4,6 +4,7 @@ import {
     downloadUrl, downloadBlob, loadSfdt,
     updateMetadata, updateStatus, mergeAndSaveDocx, getItemVersions
 } from './api';
+import { buildContentExport } from './excelExport';
 import UploadDialog from './components/UploadDialog';
 import DocxEditorDialog from './components/DocxEditorDialog';
 import './App.css';
@@ -206,6 +207,36 @@ export default function App() {
         return true;
     };
 
+    // Export to Excel is a DOCX-only operation, built CLIENT-SIDE with the
+    // Syncfusion JS Excel library (@syncfusion/ej2-xlsx): metadata comes
+    // from the in-memory list; the plain-text extract is fetched per item
+    // from the server (GET /items/{id}/text — the server-side half of the
+    // Core sample's ExtractPlainText). The button is enabled only when
+    // every selected item is a DOCX file.
+    const canExportExcel = () => {
+        if (selectedIds.size === 0) return false;
+        for (const it of items) {
+            if (!selectedIds.has(it.id)) continue;
+            if (!(it.currentFile || '').toLowerCase().endsWith('.docx')) return false;
+        }
+        return true;
+    };
+
+    const handleExportExcel = async () => {
+        if (selectedIds.size === 0) { showToast('Select at least one DOCX item.', 'info'); return; }
+        if (!canExportExcel()) { showToast('Export to Excel supports DOCX items only. Deselect any XLSX or PPTX files.', 'info'); return; }
+        setBusy(true);
+        try {
+            const sel = selectedItems();
+            const bytes = await buildContentExport(sel);
+            const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            downloadBlob(blob, 'ContentExport.xlsx');
+            showToast(`Excel export ready (${sel.length} item(s)).`, 'success');
+        } catch (e) {
+            showToast('Export failed: ' + (e.message || e), 'error');
+        } finally { setBusy(false); }
+    };
+
     const handleMetadata = () => {
         const item = requireSingle('edit metadata');
         if (item) setMetaItem(item);
@@ -372,6 +403,14 @@ export default function App() {
                     title={singleSelected() ? 'Download the current version of this document as SFDT' : 'Select a single DOCX document to download it as SFDT'}
                 >
                     Download SFDT
+                </button>
+                <button
+                    className="cl-btn cl-btn-primary"
+                    onClick={handleExportExcel}
+                    disabled={busy || !canExportExcel()}
+                    title={canExportExcel() ? 'Export selected DOCX documents to an Excel workbook (built in the browser)' : 'Select at least one DOCX document to enable Export Excel'}
+                >
+                    Export Excel
                 </button>
                 <button className="cl-btn cl-btn-danger" onClick={handleDelete} disabled={busy || selectedIds.size === 0}>Delete</button>
             </div>

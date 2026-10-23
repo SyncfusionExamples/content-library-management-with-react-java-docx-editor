@@ -82,6 +82,18 @@ export async function loadSfdt(id, version) {
     return response.text();
 }
 
+// Fetches the readable plain text of a stored version (no formatting,
+// styles, tables, images). Used by the client-side Excel export, which
+// combines this with the item metadata already in state.
+export async function getItemText(id, version) {
+    const v = version ? `?version=${version}` : '';
+    const response = await fetch(`${CONTENT_BASE}/items/${id}/text${v}`);
+    if (!response.ok) {
+        throw new Error(`Load text failed: HTTP ${response.status}`);
+    }
+    return response.text();
+}
+
 export async function saveNewVersion(id, base64Data, modifiedUser) {
     return handle(await fetch(`${CONTENT_BASE}/items/${id}/versions`, {
         method: 'POST',
