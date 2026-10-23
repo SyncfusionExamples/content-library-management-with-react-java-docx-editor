@@ -245,6 +245,49 @@ public class ContentLibraryController {
 				.body(sfdt);
 	}
 
+	// ---------- 5c. Extract readable plain text from a stored version ----------
+	// Same conversion the editor open uses: reads the v{n}.docx from App_Data
+	// via DocIO and returns the plain body text (no formatting, styles, tables,
+	// images, colors). The client combines this with the item metadata it
+	// already has and builds the Excel export workbook client-side.
+	@GetMapping("/items/{id}/text")
+	public ResponseEntity<String> extractText(@PathVariable("id") String id,
+			@RequestParam(value = "version", required = false) Integer version) throws Exception {
+		ContentItem item = library.findById(id);
+		if (item == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		int v = version != null ? version : item.getCurrentVersion();
+		ContentVersion versionInfo = null;
+		for (ContentVersion candidate : item.getVersions()) {
+			if (candidate.getVersionNumber() == v) {
+				versionInfo = candidate;
+				break;
+			}
+		}
+		if (versionInfo == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Path path = library.getItemFolder(id).resolve(versionInfo.getFileName());
+		if (!Files.exists(path)) {
+			return ResponseEntity.notFound().build();
+		}
+
+		WordDocument document = new WordDocument(Files.newInputStream(path),
+				com.syncfusion.docio.FormatType.Docx);
+		String text;
+		try {
+			text = document.getText();
+		} finally {
+			document.close();
+		}
+		return ResponseEntity.ok()
+				.contentType(MediaType.parseMediaType("text/plain"))
+				.body(text != null ? text : "");
+	}
+
 	// ---------- 6. Delete an item ----------
 	@DeleteMapping("/items/{id}")
 	public ResponseEntity<?> delete(@PathVariable("id") String id) {

@@ -21,6 +21,7 @@
     "@syncfusion/ej2-react-notifications": "^35.1.37",
     "@syncfusion/ej2-react-popups": "^35.1.37",
     "@syncfusion/ej2-tailwind3-theme": "^35.1.37",
+    "@syncfusion/ej2-xlsx": "^35.1.41",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
